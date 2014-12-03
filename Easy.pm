@@ -59,7 +59,7 @@ sub Mail::Sender::easy {
     my @siteheaders = (
         qq{X-Mailer: use SimpleMood; - Sent via the email() function or easy() method of Mail/Sender/Easy.pm and/or SimpleMood.pm both by Daniel Muey.},
     );
-    push @siteheaders, qq{X-Mailer: Sent via $file ($0) on $host by uid $< ($user) / euid $> ($eusr) at $time (unix epoch)}) unless $no_leak_path;
+    push @siteheaders, qq{X-Mailer: Sent via $file ($0) on $host by uid $< ($user) / euid $> ($eusr) at $time (unix epoch)} unless $no_leak_path;
     push @siteheaders, qq(X-Mailer: SMTP Auth provided by (object data) $sndr->{'authid'}) if $sndr->{'authid'};
     push @siteheaders, qq(X-Mailer: SMTP Auth provided by (hashref arg) $mail_ref->{'authid'}) if $mail_ref->{'authid'};
 
