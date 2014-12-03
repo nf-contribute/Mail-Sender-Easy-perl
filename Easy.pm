@@ -68,6 +68,33 @@ sub Mail::Sender::easy {
         local $Mail::Sender::SITE_HEADERS = join("\015\012", @siteheaders) || '';
         
         if($html) {
+            #This is the type of email MIME format we are trying to build:
+            #
+            # Content-Type: multipart/mixed
+            # boundary="boundary1"
+            # TEXT
+            # --boundary1
+            #    Content-Type: multipart/alternative
+            #    boundary="boundary2"
+            #    --boundary2
+            #       Content-Type: text/plain
+            #       TEXT
+            #    --boundary2
+            #       Content-Type: multipart/related
+            #       boundary="boundary3"
+            #       --boundary3
+            #          Content-Type: text/html
+            #          TEXT
+            #       --boundary3
+            #          Content-Type: image/png
+            #          TEXT
+            #       --boundary3--
+            #    --boundary2--
+            # --boundary1
+            #    Content-Type: application/pdf
+            #    TEXT
+            # --boundary1--
+
             $mail_ref->{'multipart'} = 'mixed';
             $sndr->OpenMultipart($mail_ref);
             $sndr->Part({
