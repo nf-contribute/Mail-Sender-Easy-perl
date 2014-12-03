@@ -23,3 +23,6 @@ Tested cases passed:
 - (failed) Gmail Android app (latest running on 4.4.2 Android) (email with 1 embedded image / 1 attachment) Image didn't load!
 - (failed) Gmail Android app (latest running on 4.4.2 Android) (email with 2 embedded images / 1 attachment) Image didn't load!
 - (failed) Gmail Android app (latest running on 4.4.2 Android) (email with 1 embedded image / 2 attachments) Image didn't load!
+
+I've commented on open bug reports for the embedded images not working on the Gmail Android app. It seems
+there are quite a few other developers complaining about this as well.
