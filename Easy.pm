@@ -54,6 +54,7 @@ sub Mail::Sender::easy {
     my $eusr = $^O eq 'MSWin32' ? "(Windows: $>)" : getpwuid($>);
     my $file = File::Spec->rel2abs($0);
     my $host = $hostname_code->();
+    my $had_images;
  
     my @siteheaders = (
         qq{X-Mailer: use SimpleMood; - Sent via the email() function or easy() method of Mail/Sender/Easy.pm and/or SimpleMood.pm both by Daniel Muey.},
@@ -108,9 +109,15 @@ sub Mail::Sender::easy {
             });
             $sndr->SendLineEnc($text);
 
-            $sndr->Part({
-                'ctype' => 'multipart/related'
-            });
+            #If we have images, put them one level deeper in the MIME chain
+            if(defined $attachments && ref $attachments eq 'HASH') {
+               $had_images = (grep { $attachments->{$_}{'_inline'} } (keys %{ $attachments })) ? 1 : 0;
+               if ($had_images) {
+                  $sndr->Part({
+                      'ctype' => 'multipart/related'
+                  });
+               }
+            }
 
             $sndr->Part({
                 %{ $html_info },
@@ -149,7 +156,9 @@ sub Mail::Sender::easy {
 
                 #Encountered first attachment that isn't an image
                 if((not defined $attachments->{ $attach }{'_inline'}) && $html && !$processed_all_images) {
-                   $sndr->EndPart('multipart/related');
+                   if ($had_images) {
+                      $sndr->EndPart('multipart/related');
+                   }
                    $sndr->EndPart('multipart/alternative');
                    $processed_all_images = 1;
                 }
