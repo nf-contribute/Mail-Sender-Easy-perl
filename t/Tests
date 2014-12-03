@@ -1,0 +1,25 @@
+Tested cases passed:
+- Thunderbird 31.2.0 (email with no embedded images / no attachments)
+- Thunderbird 31.2.0 (email with no embedded images / 1 attachments)
+- Thunderbird 31.2.0 (email with 1 embedded images / no attachments)
+- Thunderbird 31.2.0 (email with 1 embedded image / 1 attachment)
+- Thunderbird 31.2.0 (email with 2 embedded images / 1 attachment)
+- Thunderbird 31.2.0 (email with 1 embedded image / 2 attachments)
+- Gmail web (email with no embedded images / no attachments)
+- Gmail web (email with no embedded images / 1 attachments)
+- Gmail web (email with 1 embedded images / no attachments)
+- Gmail web (email with 1 embedded image / 1 attachment)
+- Gmail web (email with 2 embedded images / 1 attachment)
+- Gmail web (email with 1 embedded image / 2 attachments)
+- iPhone Mail app iOS 7 (email with no embedded images / no attachments)
+- iPhone Mail app iOS 7 (email with no embedded images / 1 attachments)
+- iPhone Mail app iOS 7 (email with 1 embedded images / no attachments)
+- iPhone Mail app iOS 7 (email with 1 embedded image / 1 attachment)
+- iPhone Mail app iOS 7 (email with 2 embedded images / 1 attachment)
+- iPhone Mail app iOS 7 (email with 1 embedded image / 2 attachments)
+- Gmail Android app (latest running on 4.4.2 Android) (email with no embedded images / no attachments)
+- Gmail Android app (latest running on 4.4.2 Android) (email with no embedded images / 1 attachments)
+- (failed) Gmail Android app (latest running on 4.4.2 Android) (email with 1 embedded images / no attachments) Image didn't load!
+- (failed) Gmail Android app (latest running on 4.4.2 Android) (email with 1 embedded image / 1 attachment) Image didn't load!
+- (failed) Gmail Android app (latest running on 4.4.2 Android) (email with 2 embedded images / 1 attachment) Image didn't load!
+- (failed) Gmail Android app (latest running on 4.4.2 Android) (email with 1 embedded image / 2 attachments) Image didn't load!
