@@ -37,7 +37,7 @@ sub Mail::Sender::easy {
     my $text        = delete $mail_ref->{'_text'};
     my $html        = delete $mail_ref->{'_html'};
     my $attachments = delete $mail_ref->{'_attachments'};
-    my $no_custom_headers = delete $mail_ref->{'_no_custom_headers'};
+    my $no_leak_path = delete $mail_ref->{'_no_leak_path'};
 
     my $text_info   = ref $mail_ref->{'_text_info'} eq 'HASH' 
                       ? delete $mail_ref->{'_text_info'} : {};
@@ -57,17 +57,15 @@ sub Mail::Sender::easy {
  
     my @siteheaders = (
         qq{X-Mailer: use SimpleMood; - Sent via the email() function or easy() method of Mail/Sender/Easy.pm and/or SimpleMood.pm both by Daniel Muey.},
-        qq{X-Mailer: Sent via $file ($0) on $host by uid $< ($user) / euid $> ($eusr) at $time (unix epoch)},
     );
+    push @siteheaders, qq{X-Mailer: Sent via $file ($0) on $host by uid $< ($user) / euid $> ($eusr) at $time (unix epoch)}) unless $no_leak_path;
     push @siteheaders, qq(X-Mailer: SMTP Auth provided by (object data) $sndr->{'authid'}) if $sndr->{'authid'};
     push @siteheaders, qq(X-Mailer: SMTP Auth provided by (hashref arg) $mail_ref->{'authid'}) if $mail_ref->{'authid'};
 
     croak q{You must specify the "_text" key.} if !defined $text;
 
     eval {
-        unless ($no_custom_headers) {
-        	local $Mail::Sender::SITE_HEADERS = join("\015\012", @siteheaders) || '';
-        }
+        local $Mail::Sender::SITE_HEADERS = join("\015\012", @siteheaders) || '';
         
         if($html) {
             $mail_ref->{'multipart'} = 'mixed';
@@ -341,20 +339,21 @@ Send an email via SMTP with authentication, on an alternate port, a plain text p
     use Mail::Sender::Easy qw(email);   
 
     email({
-        'from'         => 'foo@bar.baz',
-        'to'           => 'you@ddre.ss',
-        'cc'           => 'your_pal@ddre.ss',
-        'subject'      => 'Perl is great!',
-        'priority'     => 2, # 1-5 high to low
-        'confirm'      => 'delivery, reading',
-        'smtp'         => '1.2.3.4',
-        'port'         => 26,
-        'auth'         => 'LOGIN',
-        'authid'       => 'foo@bar.baz',
-        'authpwd'      => 'protect_with_700_perms_or_get_it_from_input',
-        '_text'        => 'Hello *World* :)',    
-        '_html'        => 'Hello <b>World</b> <img src="cid:smile1" />',
-        '_attachments' => {
+        'from'          => 'foo@bar.baz',
+        'to'            => 'you@ddre.ss',
+        'cc'            => 'your_pal@ddre.ss',
+        'subject'       => 'Perl is great!',
+        'priority'      => 2, # 1-5 high to low
+        'confirm'       => 'delivery, reading',
+        'smtp'          => '1.2.3.4',
+        'port'          => 26,
+        'auth'          => 'LOGIN',
+        'authid'        => 'foo@bar.baz',
+        'authpwd'       => 'protect_with_700_perms_or_get_it_from_input',
+        '_no_leak_path' => 1,
+        '_text'         => 'Hello *World* :)',    
+        '_html'         => 'Hello <b>World</b> <img src="cid:smile1" />',
+        '_attachments'  => {
             'smiley.gif' => {
                 '_disptype'   => 'GIF Image',
                 '_inline'     => 'smile1',
