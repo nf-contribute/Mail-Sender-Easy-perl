@@ -27,7 +27,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(email);
 
-use version;our $VERSION = qv('0.0.5');
+use version;our $VERSION = qv('0.0.5.1');
 
 sub email { Mail::Sender->new()->easy(shift()); }
 
@@ -37,6 +37,7 @@ sub Mail::Sender::easy {
     my $text        = delete $mail_ref->{'_text'};
     my $html        = delete $mail_ref->{'_html'};
     my $attachments = delete $mail_ref->{'_attachments'};
+    my $no_custom_headers = delete $mail_ref->{'_no_custom_headers'};
 
     my $text_info   = ref $mail_ref->{'_text_info'} eq 'HASH' 
                       ? delete $mail_ref->{'_text_info'} : {};
@@ -64,7 +65,9 @@ sub Mail::Sender::easy {
     croak q{You must specify the "_text" key.} if !defined $text;
 
     eval {
-        local $Mail::Sender::SITE_HEADERS = join("\015\012", @siteheaders) || '';
+        unless ($no_custom_headers) {
+        	local $Mail::Sender::SITE_HEADERS = join("\015\012", @siteheaders) || '';
+        }
         
         if($html) {
             $mail_ref->{'multipart'} = 'mixed';
@@ -82,6 +85,10 @@ sub Mail::Sender::easy {
             $sndr->SendLineEnc($text);
 
             $sndr->Part({
+                'ctype' => 'multipart/related'
+            });
+
+            $sndr->Part({
                 %{ $html_info },
                 'ctype'       => 'text/html',  
                 'disposition' => 'NONE', 
@@ -89,7 +96,6 @@ sub Mail::Sender::easy {
             });
             $sndr->SendLineEnc($html);
 
-            $sndr->EndPart('multipart/alternative');
         } 
         elsif(!$html && $attachments) {
             $sndr->OpenMultipart($mail_ref);
@@ -110,7 +116,21 @@ sub Mail::Sender::easy {
         }
 
         if(defined $attachments && ref $attachments eq 'HASH') {
-            for my $attach (keys %{ $attachments }) {
+            my @attach_array = keys %{ $attachments };
+
+            #sort attachments that define _inline attachments to be first
+            @attach_array = sort { ($attachments->{$b}{'_inline'} || '') cmp ($attachments->{$a}{'_inline'} || '') } @attach_array;
+
+            my $processed_all_images;
+
+            for my $attach (@attach_array) {
+
+                #Encountered first attachment that isn't an image
+                if((not defined $attachments->{ $attach }{'_inline'}) && $html && !$processed_all_images) {
+                   $sndr->EndPart('multipart/related');
+                   $sndr->EndPart('multipart/alternative');
+                   $processed_all_images = 1;
+                }
 
                 $attachments->{ $attach }{'description'} = $attach 
                     if !defined $attachments->{ $attach }{'description'};
