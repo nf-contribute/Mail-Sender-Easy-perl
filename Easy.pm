@@ -68,11 +68,13 @@ sub Mail::Sender::easy {
     eval {
         local $Mail::Sender::SITE_HEADERS = join("\015\012", @siteheaders) || '';
         
-        if($html) {
-            #This is the type of email MIME format we are trying to build:
+        if($html 
+           && defined $attachments
+           && ref $attachments eq 'HASH'
+           && keys %{ $attachments } > 0) {
             #(Taken from generated emails using Mozilla Thunderbird.)
             #
-            #Example 1: Image (PNG) and PDF attachment
+            #Image (PNG) and PDF attachment
             # Content-Type: multipart/mixed
             # boundary="boundary1"
             # Fallback TEXT
@@ -95,18 +97,6 @@ sub Mail::Sender::easy {
             #    --boundary2--
             # --boundary1
             #    Content-Type: application/pdf
-            #    TEXT
-            # --boundary1--
-            
-            #Example 2: no attachments:
-            # Content-Type: multipart/alternative
-            # boundary="boundary1"
-            # Fallback TEXT
-            # --boundary1
-            #    Content-Type: text/plain
-            #    TEXT
-            # --boundary1
-            #    Content-Type: text/html
             #    TEXT
             # --boundary1--
 
@@ -140,7 +130,38 @@ sub Mail::Sender::easy {
             });
             $sndr->SendLineEnc($html);
 
-        } 
+        }
+        elsif ($html) {
+            #No attachments, just HTML. MIME should look like this:
+            #
+            # Content-Type: multipart/alternative
+            # boundary="boundary1"
+            # Fallback TEXT
+            # --boundary1
+            #    Content-Type: text/plain
+            #    TEXT
+            # --boundary1
+            #    Content-Type: text/html
+            #    TEXT
+            # --boundary1--
+            
+            $mail_ref->{'multipart'} = 'alternative';
+            $sndr->OpenMultipart($mail_ref);
+
+            $sndr->Part({
+                %{ $text_info }, 
+                'ctype'       => 'text/plain', 
+                'disposition' => 'NONE', 
+            });
+            $sndr->SendLineEnc($text);
+
+            $sndr->Part({
+                %{ $html_info },
+                'ctype'       => 'text/html',  
+                'disposition' => 'NONE', 
+            });
+            $sndr->SendLineEnc($html);
+        }
         elsif(!$html && $attachments) {
             $sndr->OpenMultipart($mail_ref);
             $sndr->Body({
