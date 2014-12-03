@@ -70,10 +70,12 @@ sub Mail::Sender::easy {
         
         if($html) {
             #This is the type of email MIME format we are trying to build:
+            #(Taken from generated emails using Mozilla Thunderbird.)
             #
+            #Example 1: Image (PNG) and PDF attachment
             # Content-Type: multipart/mixed
             # boundary="boundary1"
-            # TEXT
+            # Fallback TEXT
             # --boundary1
             #    Content-Type: multipart/alternative
             #    boundary="boundary2"
@@ -93,6 +95,18 @@ sub Mail::Sender::easy {
             #    --boundary2--
             # --boundary1
             #    Content-Type: application/pdf
+            #    TEXT
+            # --boundary1--
+            
+            #Example 2: no attachments:
+            # Content-Type: multipart/alternative
+            # boundary="boundary1"
+            # Fallback TEXT
+            # --boundary1
+            #    Content-Type: text/plain
+            #    TEXT
+            # --boundary1
+            #    Content-Type: text/html
             #    TEXT
             # --boundary1--
 
