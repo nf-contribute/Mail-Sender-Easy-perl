@@ -80,7 +80,6 @@ sub Mail::Sender::easy {
                 %{ $text_info }, 
                 'ctype'       => 'text/plain', 
                 'disposition' => 'NONE', 
-#               'msg'         => "$text$CRLF" 
             });
             $sndr->SendLineEnc($text);
 
@@ -92,7 +91,6 @@ sub Mail::Sender::easy {
                 %{ $html_info },
                 'ctype'       => 'text/html',  
                 'disposition' => 'NONE', 
-#               'msg'         => "$html$CRLF" 
             });
             $sndr->SendLineEnc($html);
 
@@ -103,7 +101,6 @@ sub Mail::Sender::easy {
                 %{ $text_info },
                 'ctype'       => 'text/plain',
                 'disposition' => 'NONE',
-#               'msg'   => $text,
             });
             $sndr->SendLineEnc($text);
         } 
